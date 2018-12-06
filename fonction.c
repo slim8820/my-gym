@@ -1,79 +1,119 @@
-#include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
-#include "fonction.h"
-void ajouter ( admin s)
+#include<stdlib.h>
+#include"fonction.h"
+#include <stdio.h>
+void ajouter (char login[],char password[], int role)
 {
-FILE*f;
-f=fopen("user.txt","a+");
-if ( f!=NULL)
-{
-fprintf(f,"%s %s %s %s %d %d %d %s"
-,s.username,s.password,s.nom,s.prenom,s.dt_nais.jours,s.dt_nais.mois,s.dt_nais.annee,s.sexe);
-fclose(f);
+	FILE *f;
+	f=fopen("/home/lenovo/Projets/projet3/src/user.txt","a+");
+	if(f!=NULL){
+		fprintf(f,"%s %s %d \n",login,password,role);
+	}
+	fclose(f);
 }
-}
-int supprimer(char x[])
+void afficher()
 {
-FILE*f;
-FILE*f1;
-int test=-1;
-char nom[50];
-char prenom[50];
-char CIN[50];
-char TEL[50];
-int jour;
-int mois;
-int annee;
-int duree;
-f=fopen("user.txt","r");
-f1=fopen("fichier.txt","w");
-while(fscanf(f,"%s %s %s %s %d %d %d %d",nom,prenom,CIN,TEL,&jour,&mois,&annee,&duree)!=EOF)
-{
-if(strcmp(x,CIN)!=0)
-{
-fprintf(f1,"%s %s %s %s %d %d %d %d\n",nom,prenom,CIN,TEL,jour,mois,annee,duree);
+	FILE *f;
+	f=fopen("/home/lenovo/Projets/projet3/src/user.txt","r");
+	char login[20],password[20];
+	int role;
+	while(fscanf(f,"%s %s %d",login,password,&role)!=EOF){
+		fprintf(f,"%s %s %d", login,password,role);
+	}
+	fclose(f);
 }
-else
+int verifier(char login[],char password[])
 {
-test=1;
-}
-}
-fclose(f);
-fclose(f1);
-remove("user.txt");
-rename("fichier.txt","user.txt");
-return(test);
+	FILE *f;
+	int role;
+	char login1[20];char password1[20];
+	f=fopen("/home/lenovo/Projets/projet3/src/user.txt","r");
+	
+	while(fscanf(f,"%s %s ", login1,password1 )!=EOF){
+		if (strcmp(login1,login)==0 && strcmp(password1,password)==0)
+		{
+			fclose(f);
+			return (1);
+		}
+	}
+	fclose(f);
+	return 0;
 }
 
 
-void modifier(char nom[],char prenom[],char CIN[],char TEL[],int jour,int mois,int annee,int duree)
-{
-FILE*f;
-FILE*f1;
-char nom1[50];
-char prenom1[50];
-char CIN1[50];
-char TEL1[50];
-int jour1;
-int mois1;
-int annee1;
-int duree1;
-f=fopen("user.txt","r");
-f1=fopen("fichier.txt","w");
-while(fscanf(f,"%s %s %s %s %d %d %d %d",nom1,prenom1,CIN1,TEL1,&jour1,&mois1,&annee1,&duree1)!=EOF)
-{
-if(strcmp(CIN,CIN1)==0)
-{
-fprintf(f1,"%s %s %s %s %d %d %d %d\n",nom,prenom,CIN,TEL,jour,mois,annee,duree);
+
+
+void afficher1(GtkWidget *plistview)
+{ 
+enum { COL_SEANCE,
+       COL_DATE,
+       COL_TYPE,
+       NUM_COLS
+      };
+char seance[20],date[20],type[20];
+GtkListStore *liststore;
+GtkCellRenderer *celrender;
+GtkTreeViewColumn *col;
+liststore = gtk_list_store_new(NUM_COLS,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING);
+FILE *f;
+f=fopen("/home/lenovo/Projets/projet3/src/rdv.txt","r");
+if(f!=NULL){
+       while(fscanf(f,"%s %s %s",seance,date,type)!=EOF){
+           GtkTreeIter iter;
+            gtk_list_store_append(liststore, &iter);
+            gtk_list_store_set(liststore, &iter,
+                          COL_SEANCE, seance,
+		          COL_DATE, date,
+		          COL_TYPE, type,
+                       -1);}
+	celrender = gtk_cell_renderer_text_new();
+	col = gtk_tree_view_column_new_with_attributes("seance",celrender,"text",COL_SEANCE,NULL);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(plistview),col);
+
+	celrender = gtk_cell_renderer_text_new();
+	col = gtk_tree_view_column_new_with_attributes("date",celrender,"text",COL_DATE,NULL);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(plistview),col);
+
+	celrender = gtk_cell_renderer_text_new();
+	col = gtk_tree_view_column_new_with_attributes("type",celrender,"text",COL_TYPE,NULL);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(plistview),col);
+
+
+	gtk_tree_view_set_model (GTK_TREE_VIEW(plistview), GTK_TREE_MODEL (liststore));
+
 }
-else
+fclose(f);
+}
+void ajouter1(char seance[],char date[],char type[])
 {
-fprintf(f1,"%s %s %s %s %d %d %d %d\n",nom1,prenom1,CIN1,TEL1,jour1,mois1,annee1,duree1);
+	FILE *f ;
+	f=fopen("/home/lenovo/Projets/projet3/src/rdv.txt","a+");
+	if(f!=NULL)
+	{
+		fprintf(f,"%s %s %s \n",seance,date,type);
+	}
+	fclose(f);
 }
+void modifier(char seance[],char date[] ,char type[])
+{
+	char seance1[20], date1[20],type1[20];
+	FILE *f, *tmp;
+	f=fopen("/home/lenovo/Projets/projet3/src/rdv.txt","r");
+	tmp=fopen("/home/lenovo/Projets/projet3/src/rdv.tmp","a+");
+	while(fscanf(f,"%s %s %s",seance1,date1,type1)!=EOF){
+		if(!strcmp(date,date1)){fprintf(tmp,"%s %s %s\n",seance,date,type);}
+else fprintf(tmp,"%s %s %s\n",seance1,date1,type1);
 }
-  fclose(f);
-  fclose(f1);
-  remove("user.txt");
-  rename("fichier.txt","user.txt");
+fclose(f);
+fclose(tmp);
+rename("/home/lenovo/Projets/projet3/src/rdv.tmp","/home/lenovo/Projets/projet3/src/rdv.txt");
 }
+
+
+
+
+
+
+
+ 
+                          

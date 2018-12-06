@@ -1,17 +1,6 @@
-typedef struct
-{
-int jours;
-int mois;
-int annee;
-}Date;
-typedef struct
-{
-char username[20];
-char password[20];
-char nom[20];
-char prenom[20];
-Date dt_nais;
-char sexe[20];
-}admin;
-
-void ajouter (admin s);
+#include <gtk/gtk.h>
+void ajouter (char login[],char password[], int role);
+void afficher1(GtkWidget *plistview);
+int verifier(char login[],char password[]);
+void ajouter1(char seance[],char date[],char type[]);
+void modifier(char seance[],char date[] ,char type[]);
